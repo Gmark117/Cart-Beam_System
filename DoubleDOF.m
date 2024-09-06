@@ -1,9 +1,9 @@
-%%Preliminary Commands
+%% Preliminary Commands
 clc;
 close all;
 clear all;
 
-%%Known Quantities
+%% Known Quantities
 Young_modulus = 210; %GPa
 Density = 7850; %Kg/m^3
 
@@ -13,19 +13,18 @@ m_beam = 4.7764; %Kg
 m_shaker = 0.2000; %Kg
 m_tot = m_cart + m_disk; %Kg
 
-rod_length = 100.0; %mm
-rod_width = 25.0; %mm
-rod_thickness = 1.5; %mm
+rod_length = 0.1; %m
+rod_width = 0.025; %m
+rod_thickness = 0.0015; %m
 rod_damping_ratio = 0.01;
 rod_inertia = rod_width*(rod_thickness^3)/12; %mm^4
-rod_stiffness = 1e6*12*Young_modulus*rod_inertia/(rod_length^3);
+rod_stiffness = 12*(Young_modulus*10^9)*rod_inertia/(rod_length^3);
 
-m_rod = Density*rod_width*rod_thickness*rod_length*1e-9; %Kg
-rod_damping_factor = 2*rod_damping_ratio*sqrt(rod_stiffness*m_rod);
+m_rod = Density*rod_width*rod_thickness*rod_length; %Kg
+rod_damping_factor = 2*rod_damping_ratio*sqrt(rod_stiffness*m_beam);
 
-beam_length = 0.605; %mm
-beam_width = 0.030; %mm
-beam_thickness = 0.030; %mm
+beam_length = 605; %mm
+beam_width = 30; %mm
 
 Fs = 6400; %Hz
 min_Freq = 5; %Hz
@@ -34,7 +33,7 @@ Duration = 40; %s
 
 load('Data_SingleDOF');
 
-%%Experimental Data Acquisition
+%% Experimental Data Acquisition
 TwoDOF1 = readtable('Laboratory_Data\2dof_1.txt');
 TwoDOF2 = readtable('Laboratory_Data\2dof_2.txt');
 TwoDOF3 = readtable('Laboratory_Data\2dof_3.txt');
@@ -86,7 +85,7 @@ force5 = table2array(force5);
 cart_noise5 = table2array(cart_noise5);
 beam_noise5 = table2array(beam_noise5);
 
-%%POINT 1-2
+%% POINT 1-2
 h11 = tf([m_tot MeanC MeanK 0 0], ...
           [(m_beam*m_tot) ...
           (MeanC*m_beam + MeanC*m_tot + 2*rod_damping_factor*m_tot) ...
@@ -166,7 +165,7 @@ legend('Beam Acc. vs Force','Beam Acc. vs Force Upper','Beam Acc. vs Force Lower
 %hold off
 saveas(gcf, 'Plots\6. Cart-Beam Acceleration vs Force Transfer Function Bode Plot.png');
 
-%%POINT 3
+%% POINT 3
 %=======================Cart==================================
 [Tf1c,Fr1c] = tfestimate(force1,cart_noise1,[],[],[],Fs);
 [Tf2c,Fr2c] = tfestimate(force2,cart_noise2,[],[],[],Fs);
@@ -264,7 +263,7 @@ legend('Beam Acc. vs Force','Cart Acc. vs Force');
 hold off
 saveas(gcf, 'Plots\11. 5th Test Bode Plot.png');
 
-%%POINT 4
+%% POINT 4
 %=======================Cart==================================
 MeanTfc = mean(Tfc,2);
 SigmaTfc_R = std(real(Tfc),0,2);
@@ -296,28 +295,28 @@ bodeplot(sys_meanB,'r',sys_upperB,'r:',sys_lowerB,'r--',{31,190},opts);
 bodeplot(sys_meanC,'b',sys_upperC,'b:',sys_lowerC,'b--',{31,190},opts);
 grid on
 title('Mean Experimental Transfer Function Bode Plots');
-legend('Beam Acc. vs Force', ...
-       'Beam Acc. vs Force Upper', ...
-       'Beam Acc. vs Force Lower', ...
-       'Cart Acc. vs Force', ...
-       'Cart Acc. vs Force Upper', ...
-       'Cart Acc. vs Force Lower');
+legend('Beam', ...
+       'Beam Upper', ...
+       'Beam Lower', ...
+       'Cart', ...
+       'Cart Upper', ...
+       'Cart Lower');
 hold off
 saveas(gcf, 'Plots\12. Mean Experimental Transfer Function Bode Plots.png');
 
-%%POINT 5
+%% POINT 5
 figure(8)
 hold on
 bodeplot(h11,'b',h11_Upper,'b:',h11_Lower,'b--',{30,190},opts);
 bodeplot(sys_meanB,'r',sys_upperB,'r:',sys_lowerB,'r--',{30,190},opts);
 grid on
 title('Analytical and experimental Beam Acc. vs Force Bode Plots');
-legend('Analytical Beam Acc. vs Force', ...
-       'Analytical Beam Acc. vs Force Upper', ...
-       'Analytical Beam Acc. vs Force Lower', ...
-       'Experimental Beam Acc. vs Force', ...
-       'Experimental Beam Acc. vs Force Upper', ...
-       'Experimental Beam Acc. vs Force Lower');
+legend('Analytical', ...
+       'Analytical Upper', ...
+       'Analytical Lower', ...
+       'Experimental', ...
+       'Experimental Upper', ...
+       'Experimental Lower');
 hold off
 saveas(gcf, 'Plots\13. Analytical and experimental Beam Acc. vs Force Bode Plots.png');
 
@@ -327,18 +326,18 @@ bodeplot(h21,'b',h21_Upper,'b:',h21_Lower,'b--',{30,190},opts);
 bodeplot(sys_meanC,'r',sys_upperC,'r:',sys_lowerC,'r--',{30,190},opts);
 grid on
 title('Analytical and experimental Cart Acc. vs Force Bode Plots');
-legend('Analytical Cart Acc. vs Force', ...
-       'Analytical Cart Acc. vs Force Upper', ...
-       'Analytical Cart Acc. vs Force Lower', ...
-       'Experimental Cart Acc. vs Force', ...
-       'Experimental Cart Acc. vs Force Upper', ...
-       'Experimental Cart Acc. vs Force Lower');
+legend('Analytical', ...
+       'Analytical Upper', ...
+       'Analytical Lower', ...
+       'Experimental', ...
+       'Experimental Upper', ...
+       'Experimental Lower');
 hold off
 saveas(gcf, 'Plots\14. Analytical and experimental Cart Acc. vs Force Bode Plots.png');
 
-%%POINT 6
-s21 = sqrt(-1)*Fr1c(lim1:lim2).*(2*pi);
+%% POINT 6
 s11 = sqrt(-1)*Fr1b(lim3:lim4).*(2*pi);
+s21 = sqrt(-1)*Fr1c(lim1:lim2).*(2*pi);
 
 par_h11 = @(K,C,rod_K,rod_C) ...
             (m_tot.*s11.^4 + C.*s11.^3 + K.*s11.^2)./ ...
@@ -365,11 +364,10 @@ err_h11 = @(x) ...
             rms(MeanTmB-abs(par_h11(x(1),x(2),x(3),x(4))));
 err_h21 = @(x) ...
             rms(MeanTmC-abs(par_h21(x(1),x(2),x(3),x(4))));
-
-K0 = 2000;
-C0 = 1;
-rod_K0 = 1e4;
-rod_C0 = 0.7;
+K0 = MeanK;
+C0 = MeanC;
+rod_K0 = rod_stiffness;
+rod_C0 = rod_damping_factor;
 x0 = [K0,C0,rod_K0,rod_C0];
 
 x_opt_h11 = fminsearch(err_h11,x0);
@@ -383,11 +381,11 @@ plot(Fr1c(lim1:lim2).*(2*pi),abs(par_h11(x0(1),x0(2),x0(3),x0(4))))
 plot(Fr1c(lim1:lim2).*(2*pi),abs(par_h11(x_opt_h11(1),x_opt_h11(2),x_opt_h11(3),x_opt_h11(4))))
 grid on
 xlabel('Frequency (rad/s)')
-ylabel('Module Of The Transfer Function')
+ylabel('Module Of Transfer Function')
 title('Beam Transfer Function Fitting')
-legend('Module Of Experimental Transfer Function', ...
-       'Module Of Analytical Transfer Function at Initial Guess', ...
-       'Module Of Analytical Transfer Function at Optimal Solution')
+legend('Experimental TF', ...
+       'Analytical TF at Initial Guess', ...
+       'Analytical TF at Optimal Solution')
 hold off
 saveas(gcf, 'Plots\15. Beam Transfer Function Fitting.png');
 
@@ -400,13 +398,11 @@ grid on
 xlabel('Frequency (rad/s)')
 ylabel('Module Of The Transfer Function')
 title('Cart Transfer Function Fitting')
-legend('Module Of Experimental Transfer Function', ...
-       'Module Of Analytical Transfer Function at Initial Guess', ...
-       'Module Of Analytical Transfer Function at Optimal Solution')
+legend('Experimental TF', ...
+       'Analytical TF at Initial Guess', ...
+       'Analytical TF at Optimal Solution')
 hold off
 saveas(gcf, 'Plots\16. Cart Transfer Function Fitting.png');
-
-
 
 
 
